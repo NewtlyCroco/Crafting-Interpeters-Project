@@ -44,7 +44,7 @@ public class Main {
 
     private static void runFile(String path) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
-       run(new String(bytes, Charset.defaultCharset()));
+        run(new String(bytes, Charset.defaultCharset()));
 
        //indicate that and error occured in our exiting code
         if(hadError) System.exit(64);
