@@ -1,3 +1,5 @@
+package org.example;
+
 public class Token {
     final TokenType type;//this is the basis of all lexical analysis work, over the entirety of our source files, we break up the lines into stuff actually readable, and occasically spit out tokens to be processed if there is proper logic, then we process the logic and so on! How facinating!
     final String lexeme;

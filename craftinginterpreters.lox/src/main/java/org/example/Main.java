@@ -9,7 +9,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
+
+import java.util.stream.Collectors;
 
 public class Main {
     static Boolean hadError = false;
@@ -52,14 +53,13 @@ public class Main {
 
     private static void run(String source) {
         Scanner scanner = new Scanner(source);
-        List<Token> tokens = scanner.tokens();//we need to implement this class later, don't worry about it now!
+        List<Token> tokens = scanner.scanTokens();//we need to implement this class later, don't worry about it now!
         for (Token token : tokens) {
             System.out.println(token);
         }
     }
 
     static void error(int line, String message){
-
         report(line, "", message);
     }
    private static void report(int line, String where, String message){
