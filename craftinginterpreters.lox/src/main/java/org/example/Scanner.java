@@ -1,17 +1,45 @@
 package org.example;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.example.TokenType.*;
 
 public class Scanner {
     private final String source;
     private final List<Token> tokens = new ArrayList<>();
+    private static final Map<String, TokenType> keywords;
+
+    //introduces the idea of maximal munch, we need to be able to check what rule basically the section of raw code matches THE MOST to determine what lexeme it is, for example if the word orchid appears, then it could possibley be broken into the lexeme of or and chid but we wouldnt want that
+
+    static {
+        keywords = new HashMap<>();
+        keywords.put("and", AND);
+        keywords.put("class", CLASS);
+        keywords.put("else", ELSE);
+        keywords.put("false",FALSE);
+        keywords.put("for", FOR);
+        keywords.put("if", IF);
+        keywords.put("fun", FUN);
+        keywords.put("nil", NIL);
+        keywords.put("or", OR);
+        keywords.put("print", PRINT);
+        keywords.put("return", RETURN);
+        keywords.put("super", SUPER);
+        keywords.put("this", THIS);
+        keywords.put("true", TRUE);
+        keywords.put("var", VAR);
+        keywords.put("while", WHILE);
+    }
 
     private int start = 0;
     private int current = 0;
     private int line = 1;
+
+
+
 
     Scanner(String source){
         this.source = source;
@@ -23,7 +51,7 @@ public class Scanner {
 
     List<Token> scanTokens(){
         while(!isAtEnd()){
-            start = current;
+            start = current;//restart were the start index is so that we can resuse the current index to move and scane the next possible lexeme
             scanToken();
         }
         tokens.add(new Token(EOF, "",null, line));
@@ -71,16 +99,34 @@ public class Scanner {
             case '"':
                 string(); break;
 
+
             default:
                 if (isDigit(c)){
                     number();
+                } else if (isAlpha(c)){
+                    identifier();
                 }
                 else {
                     Main.error(line, "Unexpected Character");
                 }
                 break;//super important to our program and in conjunction with the advance method, we keep scanning until the whole source file is scanned so that user does not have to play whack a mole with the errors they are receiveing and can rather see all the errors at once produced by the compiler!
-
         }
+    }
+
+    private void identifier(){
+        while (isAlphaNumeric(peek())) advance();
+        String text = source.substring(start, current);
+        TokenType type = keywords.get(text);
+        if(type == null) type = IDENTIFIER;
+        addToken(type);//this identifying is extremely important, and allows us to differentiate lexemes and reserved words from strings/invalid characters or just other occurences of reserved words in weird places or inside other words
+    }
+
+    private boolean isAlpha(char c){
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
+    }
+
+    private boolean isAlphaNumeric(char c){
+        return isAlpha(c) || isDigit(c);
     }
 
     private char peek() {
@@ -101,7 +147,6 @@ public class Scanner {
         current++;
         return source.charAt(current - 1);
     }
-
     private void addToken(TokenType type){
         addToken(type, null);
     }
